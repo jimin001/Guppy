@@ -50,7 +50,7 @@ task tarFiles {
 		String outname
 
 		Int diskSizeGB = 512
-		Array[String] zones = ['us-west1-b']
+		String zones = 'us-west1-b'
 		String dockerImage = "tpesout/megalodon:latest"
 	}
 
@@ -79,7 +79,7 @@ task unzipFile {
 		File tarFile
 
 		Int diskSizeGB = 512
-		Array[String] zones = ['us-west1-b']
+		String zones = 'us-west1-b'
 		String dockerImage = "tpesout/megalodon:latest"
 	}
 
