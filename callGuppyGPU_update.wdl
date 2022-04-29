@@ -17,12 +17,10 @@ workflow callGuppyGPU {
 
 		}
 
-		Array[File] fast5s = unzipTarFile.untar_output
-
 
 		call guppyGPU {
 			input:
-				FAST5 = fast5s
+				FAST5 = unzipTarFile.untar_output
 		}
 
 	}
@@ -99,7 +97,7 @@ task guppyGPU {
 		Int q = 250000
 
 		### needs to be updated ###
-		String dockerImage = "guppy_gpu:latest" 
+		String dockerImage = "jiminpark/guppy-wdl:latest" 
 
 
 		# needs to be updated
