@@ -6,7 +6,7 @@ workflow callGuppyGPU {
 	Array[File] fast5_or_tar
 
 	# unzip in the case of tar file
-	scatter(inputFile in fast5_or_tar){
+	scatter (inputFile in fast5_or_tar){
 		call unzipTarFile {
 			input: 
 				tarfile=inputFile
