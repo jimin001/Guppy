@@ -97,13 +97,13 @@ task guppyGPU {
 
 	runtime {
 		memory: memSizeGB + " GB"
-        cpu: threadCount
-        disks: "local-disk " + diskSizeGB + " SSD"
-        gpuCount: gpuCount
-        gpuType: gpuType
-        nvidiaDriverVersion: nvidiaDriverVersion
-        docker: dockerImage
-        zones: zones
+        	cpu: threadCount
+        	disks: "local-disk " + diskSizeGB + " SSD"
+       		gpuCount: gpuCount
+        	gpuType: gpuType
+        	nvidiaDriverVersion: nvidiaDriverVersion
+        	docker: dockerImage
+        	zones: zones
 	}
 
 
