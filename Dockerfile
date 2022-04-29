@@ -5,7 +5,7 @@ CMD nvidia-smi
 # File Author / Maintainer
 MAINTAINER Laurent Jourdren <jourdren@biologie.ens.fr>
 
-ARG PACKAGE_VERSION=6.0.1
+ARG PACKAGE_VERSION=6.1.2
 ARG BUILD_PACKAGES="wget apt-transport-https"
 ARG DEBIAN_FRONTEND=noninteractive
 
