@@ -6,7 +6,7 @@ workflow callGuppyGPU {
 	Array[File] fast5_or_tar
 
 	# unzip in the case of tar file
-	scatter(inputFile in fast5_or_tar){
+	scatter (inputFile in fast5_or_tar){
 		call unzipTarFile {
 			input: 
 				tarfile=inputFile
@@ -31,15 +31,15 @@ task unzipTarFile {
 
 	command {
 		# Set the exit code of a pipeline to that of the rightmost command
-        # to exit with a non-zero status, or zero if all commands of the pipeline exit
-        set -o pipefail
-        # cause a bash script to exit immediately when a command fails
-        set -e
-        # cause the bash shell to treat unset variables as an error and exit immediately
-        set -u
-        # echo each line of the script to stdout so we can see what is happening
-        # to turn off echo do 'set +o xtrace'
-        set -o xtrace
+		# to exit with a non-zero status, or zero if all commands of the pipeline exit
+		set -o pipefail
+		# cause a bash script to exit immediately when a command fails
+		set -e
+		# cause the bash shell to treat unset variables as an error and exit immediately
+		set -u
+		# echo each line of the script to stdout so we can see what is happening
+		# to turn off echo do 'set +o xtrace'
+		set -o xtrace
 
 
 		mkdir output
@@ -47,7 +47,7 @@ task unzipTarFile {
 
 		if [[ "${tarfile}" == *.tar ]] || [[ "${tarfile}" == *.tar.gz ]]
 		then
-            tar xvf ${tarfile}
+        	tar xvf ${tarfile}
             echo "true" >../unzipped
         else
             echo "false" >../unzipped
@@ -88,15 +88,15 @@ task guppyGPU {
 
 	command {
 		# Set the exit code of a pipeline to that of the rightmost command
-        # to exit with a non-zero status, or zero if all commands of the pipeline exit
-        set -o pipefail
-        # cause a bash script to exit immediately when a command fails
-        set -e
-        # cause the bash shell to treat unset variables as an error and exit immediately
-        set -u
-        # echo each line of the script to stdout so we can see what is happening
-        # to turn off echo do 'set +o xtrace'
-        set -o xtrace
+		# to exit with a non-zero status, or zero if all commands of the pipeline exit
+		set -o pipefail
+		# cause a bash script to exit immediately when a command fails
+		set -e
+		# cause the bash shell to treat unset variables as an error and exit immediately
+		set -u
+		# echo each line of the script to stdout so we can see what is happening
+		# to turn off echo do 'set +o xtrace'
+		set -o xtrace
 
 
 		guppy_basecaller \
@@ -123,13 +123,13 @@ task guppyGPU {
 
 	runtime {
 		memory: memSizeGB + " GB"
-        	cpu: threadCount
-        	disks: "local-disk " + diskSizeGB + " SSD"
-       		gpuCount: gpuCount
-        	gpuType: gpuType
-        	nvidiaDriverVersion: nvidiaDriverVersion
-        	docker: dockerImage
-        	zones: zones
+        cpu: threadCount
+        disks: "local-disk " + diskSizeGB + " SSD"
+       	gpuCount: gpuCount
+        gpuType: gpuType
+        nvidiaDriverVersion: nvidiaDriverVersion
+        docker: dockerImage
+        zones: zones
 	}
 
 
