@@ -1,15 +1,21 @@
 version 1.0
-reference: https://github.com/tpesout/megalodon_wdl/blob/main/wdl/megalodon.wdl
+
+#reference: https://github.com/tpesout/megalodon_wdl/blob/main/wdl/megalodon.wdl
+
 
 workflow callGuppyGPU {
 	# takes in fast5.tar or array of fast5 files
-	Array[File] fast5_or_tar
+	input {
+		Array[File] fast5_or_tar
+	}
+	
 
 	# unzip in the case of tar file
-	scatter (inputFile in fast5_or_tar){
+	scatter (inputFile in fast5_or_tar) {
+
 		call unzipTarFile {
 			input: 
-				tarfile=inputFile
+				tarfile = inputFile
 		}
 
 		# unzipped array of fast5 files
@@ -27,8 +33,12 @@ workflow callGuppyGPU {
 
 
 task unzipTarFile {
-	File tarfile
 
+	input {
+		File tarfile
+	}
+	
+	
 	command {
 		# Set the exit code of a pipeline to that of the rightmost command
 		# to exit with a non-zero status, or zero if all commands of the pipeline exit
@@ -47,11 +57,11 @@ task unzipTarFile {
 
 		if [[ "${tarfile}" == *.tar ]] || [[ "${tarfile}" == *.tar.gz ]]
 		then
-        	tar xvf ${tarfile}
-            echo "true" >../unzipped
-        else
-            echo "false" >../unzipped
-        fi
+			tar xvf ${tarfile}
+			echo "true" >../unzipped
+		else
+			echo "false" >../unzipped
+		fi
 	}
 
 	output {
@@ -64,26 +74,31 @@ task unzipTarFile {
 
 task guppyGPU {
 	
-	Array[File] FAST5
-	String OUTPUT_PATH
+	input {
 
-	File CONFIG_FILE = "dna_r9.4.1_450bps_modbases_5mc_cg_sup_prom.cfg"
+		Array[File] FAST5
+		String OUTPUT_PATH
 
-	Int READ_BATCH_SIZE = 250000
-	Int q = 250000
+		File CONFIG_FILE = "dna_r9.4.1_450bps_modbases_5mc_cg_sup_prom.cfg"
 
-	### needs to be updated ###
-	String dockerImage = "guppy_gpu:latest" 
+		Int READ_BATCH_SIZE = 250000
+		Int q = 250000
+
+		### needs to be updated ###
+		String dockerImage = "guppy_gpu:latest" 
 
 
-	# needs to be updated
-	Int memSizeGB = 500
-	Int threadCount = 12
-	Int diskSizeGB = 128
-	Int gpuCount = 1
-	String gpuType = "nvidia-tesla-v100"
-	String nvidiaDriverVersion = "418.87.00"
-	String zones = "us-west1-b"
+		# needs to be updated
+		Int memSizeGB = 500
+		Int threadCount = 12
+		Int diskSizeGB = 128
+		Int gpuCount = 1
+		String gpuType = "nvidia-tesla-v100"
+		String nvidiaDriverVersion = "418.87.00"
+		String zones = "us-west1-b"
+	}
+
+	
 
 
 	command {
