@@ -30,7 +30,7 @@ workflow callGuppyGPU {
 		Array[File] bams = guppyGPU.pass_bam
 		Array[File] fastqs = guppyGPU.pass_fastq
 		Array[File] summaries = guppyGPU.summary
-		}
+	}
 
 }
 
