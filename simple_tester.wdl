@@ -49,7 +49,7 @@ task tarFiles {
 		Array[File] files_to_tar
 		String outname
 
-		Int diskSizeGB = 512
+		#Int diskSizeGB = 512
 		String zones = 'us-west1-b'
 		String dockerImage = "tpesout/megalodon:latest"
 	}
@@ -66,7 +66,7 @@ task tarFiles {
 	runtime {
 		memory:"2 GB"
 		cpu: 1
-		disks: "local-disk " + diskSizeGB + " SSD"
+		#disks: "local-disk " + diskSizeGB + " SSD"
 		docker: dockerImage
 		preemptible: 1
 		zones: zones
@@ -78,7 +78,7 @@ task unzipFile {
 	input {
 		File tarFile
 
-		Int diskSizeGB = 512
+		#Int diskSizeGB = 512
 		String zones = 'us-west1-b'
 		String dockerImage = "tpesout/megalodon:latest"
 	}
@@ -106,7 +106,7 @@ task unzipFile {
 	runtime {
 		memory: "2 GB"
 		cpu: 1
-		disks: "local-disk " + diskSizeGB + " SSD"
+		#disks: "local-disk " + diskSizeGB + " SSD"
 		docker: dockerImage
 		preemptible: 1
 		zones: zones
