@@ -20,7 +20,7 @@ workflow callGuppyGPU {
 
 		call guppyGPU {
 			input:
-				FAST5_PATH = unzipTarFile.fast5_path
+				FAST5_PATH = unzipTarFile.input_path
 		}
 
 	}
@@ -60,13 +60,14 @@ task unzipTarFile {
 		cd output
 		echo pwd >../fast5_path
 
-		if [[ "${tar_file}" == *.tar ]] || [[ "${tar_file}" == *.tar.gz ]]
-		then
-			tar xvf ${tar_file}
+		#if [[ "${tar_file}" == *.tar ]] || [[ "${tar_file}" == *.tar.gz ]]
+		#then
+		
+		tar xvf ${tar_file}
 			
-		else
+		#else
 			
-		fi
+		#fi
 	}
 
 	output {
