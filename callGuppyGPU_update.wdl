@@ -20,7 +20,7 @@ workflow callGuppyGPU {
 
 		call guppyGPU {
 			input:
-				FAST5 = unzipTarFile.untar_output
+				FAST5_PATH = unzipTarFile.fast5_path
 		}
 
 	}
@@ -131,7 +131,7 @@ task guppyGPU {
 
 
 		guppy_basecaller \
-		-i ${sep=" " FAST5} \
+		-i ${FAST5_PATH} \
 		-s ${OUTPUT_PATH} \
 		-c /opt/ont/guppy/data/${CONFIG_FILE} \
 		--bam_out \
