@@ -58,19 +58,20 @@ task unzipTarFile {
 
 		mkdir output
 		cd output
+		echo pwd >../fast5_path
 
 		if [[ "${tar_file}" == *.tar ]] || [[ "${tar_file}" == *.tar.gz ]]
 		then
 			tar xvf ${tar_file}
-			echo "true" >../unzipped
+			
 		else
-			echo "false" >../unzipped
+			
 		fi
 	}
 
 	output {
-		Boolean tar_unzipped = read_boolean("unzipped")
 		Array[File] untar_output = glob("output/*")
+		String input_path = read_string("fast5_path")
 	}
 
 	runtime {
@@ -88,10 +89,13 @@ task guppyGPU {
 	
 	input {
 
-		Array[File] FAST5
+		#Array[File] FAST5
+
+		String FAST5_PATH
 		String OUTPUT_PATH
 
-		File CONFIG_FILE = "dna_r9.4.1_450bps_modbases_5mc_cg_sup_prom.cfg"
+		String CONFIG_FILE = "dna_r9.4.1_450bps_modbases_5mc_cg_sup_prom.cfg"
+
 
 		Int READ_BATCH_SIZE = 250000
 		Int q = 250000
@@ -127,7 +131,7 @@ task guppyGPU {
 
 
 		guppy_basecaller \
-		-i ${FAST5} \
+		-i ${sep=" " FAST5} \
 		-s ${OUTPUT_PATH} \
 		-c /opt/ont/guppy/data/${CONFIG_FILE} \
 		--bam_out \
