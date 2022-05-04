@@ -50,7 +50,7 @@ task guppyGPU {
 	}
 
 
-	command <<<
+	command {
 		# Set the exit code of a pipeline to that of the rightmost command
 		# to exit with a non-zero status, or zero if all commands of the pipeline exit
 		set -o pipefail
@@ -80,7 +80,7 @@ task guppyGPU {
 			--read_batch_size ${READ_BATCH_SIZE} \
 			-q ${q}
 
-	>>>
+	}
 
 
 	output {
