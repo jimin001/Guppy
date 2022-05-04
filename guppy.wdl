@@ -13,7 +13,7 @@ workflow callGuppyGPU {
 
 		call guppyGPU {
 			input:
-				fast5_tar = fast5_tar
+				fast5_tar = tar_file
 		}
 
 	}
@@ -29,7 +29,7 @@ task guppyGPU {
 	
 	input {
 		
-		File fast5_tar
+		File tar_file
 
 		String CONFIG_FILE = "dna_r9.4.1_450bps_modbases_5mc_cg_sup_prom.cfg"
 		Int READ_BATCH_SIZE = 250000
@@ -65,7 +65,7 @@ task guppyGPU {
 		## Extract tar file to 
 		mkdir input
 		
-		tar xvf ${fast5_tar} --directory input
+		tar xvf ${tar_file} --directory input
 
 		guppy_basecaller \
 			-i input/ \
