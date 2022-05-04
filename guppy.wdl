@@ -65,7 +65,7 @@ task guppyGPU {
 		## Extract tar file to 
 		mkdir input
 		
-		tar xvf ${tar_file} --directory input
+		tar xvf ${fast5_tar} --directory input
 
 		guppy_basecaller \
 			-i input/ \
