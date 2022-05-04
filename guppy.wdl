@@ -13,7 +13,7 @@ workflow callGuppyGPU {
 
 		call guppyGPU {
 			input:
-				fast5_tar = tar_file
+				tar_file = fast5_tar
 		}
 
 	}
