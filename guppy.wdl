@@ -13,14 +13,10 @@ workflow callGuppyGPU {
 
 		call guppyGPU {
 			input:
-<<<<<<< HEAD
 				fast5_tar = fast5_tar
-=======
-				tar_file = fast5_tar
->>>>>>> aa31054a2606652e66b16c9ac18c8e918328a49b
 		}
-
 	}
+
 	output {
 		Array[File] bams = guppyGPU.pass_bam
 		Array[File] fastqs = guppyGPU.pass_fastq
@@ -39,7 +35,7 @@ task guppyGPU {
 		Int READ_BATCH_SIZE = 250000
 		Int q = 250000
 
-		### needs to be updated ###
+		
 		String dockerImage = "jiminpark/guppy-wdl:latest" 
 
 
@@ -71,6 +67,9 @@ task guppyGPU {
 		
 		tar xvf ${fast5_tar} --directory input
 
+		mkdir output
+		cd output
+
 		guppy_basecaller \
 			-i input/ \
 			-s output/ \
@@ -85,9 +84,9 @@ task guppyGPU {
 
 
 	output {
-		File pass_bam   = glob("output/pass/*.bam")[0]
+		File pass_bam = glob("output/pass/*.bam")[0]
 		File pass_fastq = glob("output/pass/*.fastq")[0]
-		File summary    = glob("output/sequencing_summary.txt")[0]
+		File summary = glob("output/sequencing_summary.txt")[0]
 
 	}
 
