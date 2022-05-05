@@ -36,7 +36,7 @@ task guppyGPU {
 		Int q = 250000
 
 		
-		String dockerImage = "jiminpark/guppy-wdl:latest" 
+		String dockerImage = "jiminpark/guppy-wdl:t" 
 
 
 		# needs to be updated
