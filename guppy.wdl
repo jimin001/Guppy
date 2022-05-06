@@ -51,7 +51,7 @@ task guppyGPU {
 	}
 
 
-	command {
+	command <<<
 		# Set the exit code of a pipeline to that of the rightmost command
 		# to exit with a non-zero status, or zero if all commands of the pipeline exit
 		set -o pipefail
@@ -73,26 +73,26 @@ task guppyGPU {
 
 		# check if length of "additionalArgs" is zero
 
-		if [[ "${additionalArgs}" == "" ]]
+		if [[ "~{additionalArgs}" == "" ]]
 		then
 			ADDITIONAL_ARGS=""
 		else
-			ADDITIONAL_ARGS="${additionalArgs}"
+			ADDITIONAL_ARGS="~{additionalArgs}"
 		fi
 
 
 		guppy_basecaller \
 			-i input/ \
 			-s output/ \
-			-c /opt/ont/guppy/data/${CONFIG_FILE} \
+			-c /opt/ont/guppy/data/"~{CONFIG_FILE}" \
 			--bam_out \
 			-x cuda:all:100% \
 			-r \
-			--read_batch_size ${READ_BATCH_SIZE} \
-			-q ${q} \
+			--read_batch_size "~{READ_BATCH_SIZE}" \
+			-q "~{q}" \
 			${ADDITIONAL_ARGS}
 
-	}
+	>>>
 
 
 	output {
