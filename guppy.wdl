@@ -73,11 +73,11 @@ task guppyGPU {
 
 		# check if length of "additionalArgs" is zero
 
-		if [ -z "${additionalArgs}"]
+		if [ -z "~{additionalArgs}"]
 		then
-			echo "" >../ADDITIONAL_ARGS
+			ADDITIONAL_ARGS = ""
 		else
-			echo "${additionalArgs}" >../ADDITIONAL_ARGS
+			ADDITIONAL_ARGS = "~{additionalArgs}"
 		fi
 
 
