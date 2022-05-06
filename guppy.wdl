@@ -67,7 +67,7 @@ task guppyGPU {
 		mkdir input
 		
 		# place all extracted files into directory input
-		tar xvf ${fast5_tar_file} --directory input
+		tar xvf "~{fast5_tar_file}" --directory input
 
 		mkdir output
 
