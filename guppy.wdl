@@ -73,7 +73,7 @@ task guppyGPU {
 
 		# check if length of "additionalArgs" is zero
 
-		if [[ -z "${additionalArgs}" ]]
+		if [[ "${additionalArgs}" == "" ]]
 		then
 			ADDITIONAL_ARGS=""
 		else
