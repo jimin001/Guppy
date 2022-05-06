@@ -38,8 +38,9 @@ task guppyGPU {
 		
 		String dockerImage = "jiminpark/guppy-wdl:latest" 
 
+		String? additionalArgs
 
-		# needs to be updated
+
 		Int memSizeGB = 85
 		Int threadCount = 12
 		Int diskSizeGB = 500
@@ -65,20 +66,31 @@ task guppyGPU {
 		## Extract tar file to 
 		mkdir input
 		
+		# place all extracted files into directory input
 		tar xvf ${fast5_tar_file} --directory input
 
 		mkdir output
-		cd output
+
+		# check if length of "additionalArgs" is zero
+
+		if [ -z "${additionalArgs}"]
+		then
+			ADDITIONAL_ARGS = ""
+		else
+			ADDITIONAL_ARGS = "${additionalArgs}"
+		fi
+
 
 		guppy_basecaller \
-			-i /input/ \
-			-s /output/ \
+			-i input/ \
+			-s output/ \
 			-c /opt/ont/guppy/data/${CONFIG_FILE} \
 			--bam_out \
 			-x cuda:all:100% \
 			-r \
 			--read_batch_size ${READ_BATCH_SIZE} \
-			-q ${q}
+			-q ${q} \
+			${ADDITIONAL_ARGS}
 
 	}
 
