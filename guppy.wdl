@@ -71,8 +71,8 @@ task guppyGPU {
 		cd output
 
 		guppy_basecaller \
-			-i input/ \
-			-s output/ \
+			-i /input/ \
+			-s /output/ \
 			-c /opt/ont/guppy/data/${CONFIG_FILE} \
 			--bam_out \
 			-x cuda:all:100% \
