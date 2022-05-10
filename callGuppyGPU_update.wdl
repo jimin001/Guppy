@@ -58,11 +58,11 @@ task unzipTarFile {
 
 		mkdir output
 		cd output
-		echo pwd >../fast5_path
+		pwd >../fast5_path
 
 		#if [[ "${tar_file}" == *.tar ]] || [[ "${tar_file}" == *.tar.gz ]]
 		#then
-		
+
 		tar xvf ${tar_file}
 			
 		#else

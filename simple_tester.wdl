@@ -51,7 +51,7 @@ task tarFiles {
 
 		#Int diskSizeGB = 512
 		String zones = 'us-west1-b'
-		String dockerImage = "tpesout/megalodon:latest"
+		String dockerImage = "ubuntu:18.04"
 	}
 
 

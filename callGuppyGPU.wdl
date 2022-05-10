@@ -117,7 +117,7 @@ task guppyGPU {
 		guppy_basecaller \
 		-i ${FAST5} \
 		-s ${OUTPUT_PATH} \
-		-c ${CONFIG_FILE} \
+		-c /opt/ont/guppy/data/${CONFIG_FILE} \
 		--bam_out \
 		-x cuda:all:100% \
 		-r \
