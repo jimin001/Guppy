@@ -45,6 +45,7 @@ task guppyGPU {
 		Int threadCount = 12
 		Int diskSizeGB = 500
 		Int gpuCount = 1
+		Int maxRetries = 4
 		String gpuType = "nvidia-tesla-v100"
 		String nvidiaDriverVersion = "418.87.00"
 		String zones = "us-west1-b"
@@ -108,6 +109,7 @@ task guppyGPU {
         disks: "local-disk " + diskSizeGB + " SSD"
        	gpuCount: gpuCount
         gpuType: gpuType
+        maxRetries : maxRetries
         nvidiaDriverVersion: nvidiaDriverVersion
         docker: dockerImage
         zones: zones
