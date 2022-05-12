@@ -22,9 +22,12 @@ workflow parallelGuppyGPU {
 			}
 		}
 
+		# ?????
 		call concatenateFiles {
 			input:
 				bams = guppyGPU.pass_bam
+				fastqs = guppyGPU.pass_fastq
+				summaries = guppyGPU.summary
 		}
 
 	}
