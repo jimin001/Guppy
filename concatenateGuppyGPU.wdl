@@ -12,6 +12,7 @@ workflow parallelGuppyGPU {
 		call splitFast5s {
 			input:
 				file_to_split_tar = fast5_tar
+
 		}
 
 		# call guppyGPU on each of the smaller "proportioned" tar files
@@ -23,41 +24,50 @@ workflow parallelGuppyGPU {
 		}
 
 		# ?????
-		call concatenateFiles {
+		call concatenateFiles as bamFile {
 			input:
-				bams = guppyGPU.pass_bam
-				fastqs = guppyGPU.pass_fastq
-				summaries = guppyGPU.summary
+				files = guppyGPU.pass_bam,
+				file_type = "bam"
+		}
+
+		call concatenateFiles as fastqFile {
+			input:
+				files = guppyGPU.pass_fastq,
+				file_type = "fastq"
+		}
+
+		call concatenateFiles as summaryFile {
+			input:
+				files = guppyGPU.summary,
+				file_type = "txt"
 		}
 
 	}
 
 	# gather??
 	output {
-		Array[File] bams = concatenateFiles.finalBam
-		Array[File] fastqs = concatenateFiles.finalFastq
-		Array[File] summaries = concatenateFiles.finalSummary
+		Array[File] bams = bamFile.concatenatedFile
+		Array[File] fastqs = fastqFile.concatenatedFile
+		Array[File] summaries = summaryFile.concatenatedFile
 	}
 	
 }
 
 task concatenateFiles {
 	input {
-		Array[File] bams
-		Array[File] fastqs
-		Array[File] summaries
+		Array[File] files
+		String file_type
 	}
+	
 
 	command {
-		cat ${sep=" " bams} > "concat.bam"
-		cat ${sep=" " fastqs} > "concat.fastq"
-		cat ${sep=" " summaries} > "concat_summaries.txt"
+		cat ${sep=" " files} > "final.${file_type}"
+
 	}
 
 	output {
-		File finalBam = "concat.bam"
-		File finalFastq = "concat.fastq"
-		File finalSummary = "concat_summaries"
+		File concatenatedFile = "final.${file_type}"
+
 	}
 }
 
