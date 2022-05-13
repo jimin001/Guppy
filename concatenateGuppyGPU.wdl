@@ -74,7 +74,7 @@ task concatenateFiles {
 	
 
 	command {
-		if [[ ${file_type} == "bam"]]
+		if [[ ${file_type} == "bam" ]]
 		then
 			samtools merge -o "final.${file_type}" ${sep=" " files}
 		else
