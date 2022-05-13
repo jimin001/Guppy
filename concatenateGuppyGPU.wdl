@@ -59,22 +59,28 @@ task concatenateFiles {
 		Array[File] files
 		String file_type
 
-		String dockerImage = "tpesout/hpp_base:latest"
+		String dockerImage = "tpesout/megalodon:latest"
 
 		# runtime
-		Int memSizeGB = 85
-		Int threadCount = 2
+		Int memSizeGB = 8
+		Int threadCount = 3
 		Int diskSizeGB = 500
-		Int gpuCount = 1
-		Int maxRetries = 4
-		String gpuType = "nvidia-tesla-v100"
-		String nvidiaDriverVersion = "418.87.00"
 		String zones = "us-west1-b"
 	}
 	
 
 	command {
-		cat ${sep=" " files} > "final.${file_type}"
+		if [[ ${file_type} == "bam" ]]
+		then
+			samtools merge -o "final.${file_type}" ${sep=" " files} 
+
+		elif [[ ${file_type} == "fastq" ]]
+		then
+			tar -czvf "final.${file_type}.tar.gz" ${sep=" " files}
+
+		else 
+			cat ${sep=" " files} > "final.${file_type}"
+		fi
 	}
 
 	output {
@@ -85,10 +91,6 @@ task concatenateFiles {
 		memory: memSizeGB + " GB"
 		cpu: threadCount
 		disks: "local-disk " + diskSizeGB + " SSD"
-		gpuCount: gpuCount
-		gpuType: gpuType
-		maxRetries : maxRetries
-		nvidiaDriverVersion: nvidiaDriverVersion
 		docker: dockerImage
 		zones: zones
 	}
@@ -103,15 +105,15 @@ task splitFast5s {
 		String dockerImage = "jiminpark/guppy-wdl:latest" 
 
 		# runtime
-		Int memSizeGB = 85
+		Int memSizeGB = 8
+		Int extraDisk = 5
 		Int threadCount = 2
-		Int diskSizeGB = 500
-		Int gpuCount = 1
-		Int maxRetries = 4
-		String gpuType = "nvidia-tesla-v100"
-		String nvidiaDriverVersion = "418.87.00"
 		String zones = "us-west1-b"
 	}
+
+	Int file_size = ceil(size(file_to_split_tar))
+	Int diskSizeGB = 2 * file_size + extraDisk
+
 
 	command <<<
 		## Extract tar file to 
@@ -141,6 +143,7 @@ task splitFast5s {
 
 		# tar remaining directory
 		tar -czvf fast5_tarball_$OUTPUT_IDX.tar.gz $OUTPUT_DIR/*
+		rm -r $OUTPUT_DIR
 
 	>>>
 
@@ -152,10 +155,6 @@ task splitFast5s {
 		memory: memSizeGB + " GB"
 		cpu: threadCount
 		disks: "local-disk " + diskSizeGB + " SSD"
-		gpuCount: gpuCount
-		gpuType: gpuType
-		maxRetries : maxRetries
-		nvidiaDriverVersion: nvidiaDriverVersion
 		docker: dockerImage
 		zones: zones
 	}
@@ -179,15 +178,18 @@ task guppyGPU {
 		String? additionalArgs
 
 
-		Int memSizeGB = 85
-		Int threadCount = 2
-		Int diskSizeGB = 500
+		Int memSizeGB = 64
+		Int threadCount = 10
+		Int extraDisk = 5
 		Int gpuCount = 1
 		Int maxRetries = 0
 		String gpuType = "nvidia-tesla-v100"
 		String nvidiaDriverVersion = "418.87.00"
 		String zones = "us-west1-b"
 	}
+
+	Int file_size = ceil(size(fast5_tar_file))
+	Int diskSizeGB = 3 * file_size + extraDisk
 
 
 	command <<<
