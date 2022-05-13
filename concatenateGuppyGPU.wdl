@@ -4,6 +4,7 @@ workflow parallelGuppyGPU {
 	input {
 		# input must be tar files
 		Array[File] fast5_tar_files
+
 	}
 
 
@@ -57,17 +58,45 @@ task concatenateFiles {
 	input {
 		Array[File] files
 		String file_type
+
+		String dockerImage = "tpesout/hpp_base:latest"
+
+		# runtime
+		Int memSizeGB = 85
+		Int threadCount = 2
+		Int diskSizeGB = 500
+		Int gpuCount = 1
+		Int maxRetries = 4
+		String gpuType = "nvidia-tesla-v100"
+		String nvidiaDriverVersion = "418.87.00"
+		String zones = "us-west1-b"
 	}
 	
 
 	command {
-		cat ${sep=" " files} > "final.${file_type}"
+		if [[ ${file_type} == "bam"]]
+		then
+			samtools merge -o "final.${file_type}" ${sep=" " files}
+		else
+			cat ${sep=" " files} > "final.${file_type}"
+		fi
 
 	}
 
 	output {
 		File concatenatedFile = "final.${file_type}"
+	}
 
+	runtime {
+		memory: memSizeGB + " GB"
+		cpu: threadCount
+		disks: "local-disk " + diskSizeGB + " SSD"
+		gpuCount: gpuCount
+		gpuType: gpuType
+		maxRetries : maxRetries
+		nvidiaDriverVersion: nvidiaDriverVersion
+		docker: dockerImage
+		zones: zones
 	}
 }
 
@@ -81,7 +110,7 @@ task splitFast5s {
 
 		# runtime
 		Int memSizeGB = 85
-		Int threadCount = 12
+		Int threadCount = 2
 		Int diskSizeGB = 500
 		Int gpuCount = 1
 		Int maxRetries = 4
@@ -157,10 +186,10 @@ task guppyGPU {
 
 
 		Int memSizeGB = 85
-		Int threadCount = 12
+		Int threadCount = 2
 		Int diskSizeGB = 500
 		Int gpuCount = 1
-		Int maxRetries = 4
+		Int maxRetries = 0
 		String gpuType = "nvidia-tesla-v100"
 		String nvidiaDriverVersion = "418.87.00"
 		String zones = "us-west1-b"
