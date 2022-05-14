@@ -59,6 +59,7 @@ task concatenateFiles {
 		Array[File] files
 		String file_type
 
+
 		String dockerImage = "tpesout/megalodon:latest"
 
 		# runtime
@@ -111,7 +112,7 @@ task splitFast5s {
 		String zones = "us-west1-b"
 	}
 
-	Int file_size = ceil(size(file_to_split_tar))
+	Int file_size = ceil(size(file_to_split_tar, "GB"))
 	Int diskSizeGB = 2 * file_size + extraDisk
 
 
@@ -188,7 +189,7 @@ task guppyGPU {
 		String zones = "us-west1-b"
 	}
 
-	Int file_size = ceil(size(fast5_tar_file))
+	Int file_size = ceil(size(fast5_tar_file, "GB"))
 	Int diskSizeGB = 3 * file_size + extraDisk
 
 
