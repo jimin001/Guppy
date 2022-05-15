@@ -4,7 +4,7 @@ workflow parallelGuppyGPU {
 	input {
 		# input must be tar files
 		Array[File] fast5_tar_files
-
+		
 	}
 
 
@@ -31,7 +31,7 @@ workflow parallelGuppyGPU {
 				file_type = "bam"
 		}
 
-		call concatenateFiles as fastqFile {
+		call concatenateFastq as fastqFile {
 			input:
 				files = guppyGPU.pass_fastq,
 				file_type = "fastq"
@@ -48,7 +48,7 @@ workflow parallelGuppyGPU {
 	# gather??
 	output {
 		Array[File] bams = bamFile.concatenatedFile
-		Array[File] fastqs = fastqFile.concatenatedFile
+		Array[File] fastqs = fastqFile.concatenatedFastq
 		Array[File] summaries = summaryFile.concatenatedFile
 	}
 	
@@ -58,11 +58,14 @@ task concatenateFiles {
 	input {
 		Array[File] files
 		String file_type
+		String sample_name
+		String guppy_version
 
 
 		String dockerImage = "tpesout/megalodon:latest"
 
 		# runtime
+		Int preempts = 3
 		Int memSizeGB = 8
 		Int threadCount = 3
 		Int diskSizeGB = 500
@@ -73,19 +76,14 @@ task concatenateFiles {
 	command {
 		if [[ ${file_type} == "bam" ]]
 		then
-			samtools merge -o "final.${file_type}" ${sep=" " files} 
-
-		elif [[ ${file_type} == "fastq" ]]
-		then
-			tar -czvf "final.${file_type}.tar.gz" ${sep=" " files}
-
+			samtools merge -o "${sample_name}_${guppy_version}.${file_type}" ${sep=" " files} 
 		else 
-			cat ${sep=" " files} > "final.${file_type}"
+			cat ${sep=" " files} > "${sample_name}_${guppy_version}.${file_type}"
 		fi
 	}
 
 	output {
-		File concatenatedFile = "final.${file_type}"
+		File concatenatedFile = "${sample_name}_${guppy_version}.${file_type}"
 	}
 
 	runtime {
@@ -93,6 +91,44 @@ task concatenateFiles {
 		cpu: threadCount
 		disks: "local-disk " + diskSizeGB + " SSD"
 		docker: dockerImage
+		preemptible : preempts
+		zones: zones
+	}
+}
+
+# separate task to concatenate fastq files
+task concatenateFastq {
+	input {
+		Array[File] files
+		String file_type
+		String sample_name
+		String guppy_version
+
+
+		String dockerImage = "tpesout/megalodon:latest"
+
+		# runtime
+		Int preempts = 3
+		Int memSizeGB = 8
+		Int threadCount = 3
+		Int diskSizeGB = 500
+		String zones = "us-west1-b"
+	}
+
+	command {
+		tar -czvf "${sample_name}_${guppy_version}.${file_type}.tar.gz" ${sep=" " files}
+	}
+
+	output {
+		File concatenatedFastq = "${sample_name}_${guppy_version}.${file_type}.tar.gz"
+	}
+
+	runtime {
+		memory: memSizeGB + " GB"
+		cpu: threadCount
+		disks: "local-disk " + diskSizeGB + " SSD"
+		docker: dockerImage
+		preemptible : preempts
 		zones: zones
 	}
 }
@@ -106,6 +142,7 @@ task splitFast5s {
 		String dockerImage = "jiminpark/guppy-wdl:latest" 
 
 		# runtime
+		Int preempts = 3
 		Int memSizeGB = 8
 		Int extraDisk = 5
 		Int threadCount = 2
@@ -118,17 +155,24 @@ task splitFast5s {
 
 	command <<<
 		## Extract tar file to 
-		mkdir input
+		mkdir tmp
 		
-		# place all extracted files into directory input
-		tar xvf "~{file_to_split_tar}" --directory input
+		# place all extracted files into directory tmp
+		tar xvf "~{file_to_split_tar}" --directory tmp
 
-		cd input
-		
+		mkdir input
+
+		# filter out only fast5 files
+		for FILE in `find tmp/ -name "*.fast5"`
+		do
+			mv $FILE input
+		done
+
+
 		OUTPUT_IDX=0
 		OUTPUT_DIR=fast5_tar_$OUTPUT_IDX
 		mkdir $OUTPUT_DIR
-		for FILE in *.fast5
+		for FILE in `ls input`
 		do
 			if [[ $(du -s -BG $OUTPUT_DIR | sed 's/G.*//') > ~{desired_size_GB} ]] 
 			then
@@ -139,17 +183,15 @@ task splitFast5s {
 				mkdir $OUTPUT_DIR
 			fi
 			echo $(du -s -BG $OUTPUT_DIR | sed 's/G.*//')
-			mv $FILE $OUTPUT_DIR
+			mv input/$FILE $OUTPUT_DIR
 		done
-
-		# tar remaining directory
 		tar -czvf fast5_tarball_$OUTPUT_IDX.tar.gz $OUTPUT_DIR/*
 		rm -r $OUTPUT_DIR
 
 	>>>
 
 	output {
-		Array[File] split_fast5_tar = glob("input/*tar.gz")
+		Array[File] split_fast5_tar = glob("*tar.gz")
 	}
 
 	runtime {
@@ -157,6 +199,7 @@ task splitFast5s {
 		cpu: threadCount
 		disks: "local-disk " + diskSizeGB + " SSD"
 		docker: dockerImage
+		preemptible : preempts
 		zones: zones
 	}
 
@@ -178,7 +221,7 @@ task guppyGPU {
 
 		String? additionalArgs
 
-
+		Int preempts = 3
 		Int memSizeGB = 64
 		Int threadCount = 10
 		Int extraDisk = 5
@@ -252,6 +295,7 @@ task guppyGPU {
 		gpuType: gpuType
 		maxRetries : maxRetries
 		nvidiaDriverVersion: nvidiaDriverVersion
+		preemptible : preempts
 		docker: dockerImage
 		zones: zones
 	}
