@@ -159,6 +159,7 @@ task splitFast5s {
 		
 		# place all extracted files into directory tmp
 		tar xvf "~{file_to_split_tar}" --directory tmp
+		rm ~{file_to_split_tar}
 
 		mkdir input
 
